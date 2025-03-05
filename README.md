@@ -1,6 +1,6 @@
 # 用 PHP 解析 HTML
 
-[![推广图](https://github.com/luminati-io/LinkedIn-Scraper/raw/main/Proxies%20and%20scrapers%20GitHub%20bonus%20banner.png)](https://www.bright.cn/)
+[![推广图](https://github.com/bright-cn/LinkedIn-Scraper/raw/main/Proxies%20and%20scrapers%20GitHub%20bonus%20banner.png)](https://www.bright.cn/)
 
 本指南将介绍三种在 PHP 中解析 HTML 的技术，并比较它们的优劣与差异：
 
