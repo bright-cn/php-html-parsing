@@ -1,39 +1,40 @@
-# 用 PHP 解析 HTML
+# 使用 PHP 解析 HTML
 
-[![推广图](https://github.com/bright-cn/LinkedIn-Scraper/raw/main/Proxies%20and%20scrapers%20GitHub%20bonus%20banner.png)](https://www.bright.cn/)
+[![推广](https://github.com/bright-cn/Awesome-Web-Scraping/raw/main/Proxies%20and%20scrapers%20GitHub%20bonus%20banner%20CN.png)](https://www.bright.cn/) 
 
-本指南将介绍三种在 PHP 中解析 HTML 的技术，并比较它们的优劣与差异：
+本指南介绍三种使用 PHP 解析 HTML 的技术，并比较它们的优势和差异：
 
-- [用 PHP 解析 HTML](#用-php-解析-html)  
-- [为什么要在 PHP 中解析 HTML？](#为什么要在-php-中解析-html)  
-- [先决条件](#先决条件)  
-- [在 PHP 中检索 HTML](#在-php-中检索-html)  
-- [在 PHP 中解析 HTML：三种方法](#在-php-中解析-html三种方法)  
-  - [方法一：使用 Dom\HTMLDocument](#方法一使用-domhtmldocument)  
-  - [方法二：使用 Simple HTML DOM Parser](#方法二使用-simple-html-dom-parser)  
-  - [方法三：使用 Symfony 的 DomCrawler 组件](#方法三使用-symfony-的-domcrawler-组件)  
-- [在 PHP 中解析 HTML：对比表](#在-php-中解析-html对比表)  
-- [结论](#结论)  
+- [使用 PHP 解析 HTML](#使用-php-解析-html)
+- [为什么要在 PHP 中解析 HTML？](#为什么要在-php-中解析-html)
+- [前提条件](#前提条件)
+- [在 PHP 中获取 HTML](#在-php-中获取-html)
+- [在 PHP 中解析 HTML：3 种方法](#在-php-中解析-html3-种方法)
+  - [方法 1：使用 `Dom\HTMLDocument`](#方法-1使用-domhtmldocument)
+  - [方法 2：使用 Simple HTML DOM Parser](#方法-2使用-simple-html-dom-parser)
+  - [方法 3：使用 Symfony 的 DomCrawler 组件](#方法-3使用-symfony-的-domcrawler-组件)
+- [在 PHP 中解析 HTML：对比表](#在-php-中解析-html对比表)
+- [总结](#总结)
 
 ## 为什么要在 PHP 中解析 HTML？
 
-在 PHP 中解析 HTML，指的是将 HTML 内容转换为其 DOM（[文档对象模型](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model)）结构。一旦转换成 DOM 格式，就可以轻松地导航和操作 HTML 内容。
+在 PHP 中解析 HTML，需要将 HTML 内容转换为其 DOM（[文档对象模型](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model)）结构。转换为 DOM 格式后，你可以轻松浏览和操作 HTML 内容。
 
-在 PHP 中解析 HTML 的主要原因包括：
+具体来说，在 PHP 中解析 HTML 的主要原因包括：
 
 - **数据提取**：从网页中获取特定内容，包括 HTML 元素中的文本或属性。  
-- **自动化**：自动执行如内容抓取、报告生成和数据聚合等任务。  
-- **服务器端 HTML 处理**：在渲染前对 HTML 进行清理、格式化或修改，以满足应用程序的需求。  
+- **自动化**：简化内容抓取、报告生成和 HTML 数据聚合等任务。  
+- **服务端 HTML 处理**：解析和操作 HTML，以便在应用程序渲染网页内容之前对其进行清理、格式化或修改。  
 
-## 先决条件
 
-在开始编码之前，请确认你已经在本地安装了 [PHP 8.4+](https://www.php.net/releases/8.4/en.php)。可使用以下命令进行验证：
+## 前提条件
+
+开始编写代码之前，请确保你的计算机上已安装 [PHP 8.4+](https://www.php.net/releases/8.4/en.php)。你可以运行以下命令进行验证：
 
 ```bash
 php -v
 ```
 
-输出应类似于：
+输出应类似如下内容：
 
 ```
 PHP 8.4.3 (cli) (built: Jan 19 2025 14:20:58) (NTS)
@@ -42,25 +43,25 @@ Zend Engine v4.4.3, Copyright (c) Zend Technologies
     with Zend OPcache v8.4.3, Copyright (c), by Zend Technologies
 ```
 
-接下来，初始化一个 Composer 项目来简化依赖管理。如果你的系统尚未安装 Composer，请[下载并按照安装说明操作](https://getcomposer.org/download/)。
+接下来，初始化一个 Composer 项目，以便更轻松地管理依赖项。如果你的系统尚未安装 Composer，请[下载 Composer](https://getcomposer.org/download/) 并按照安装说明操作。
 
-首先，为你的 PHP HTML 项目创建一个新文件夹：
+首先，为你的 PHP HTML 项目新建一个文件夹：
 
 ```bash
 mkdir php-html-parser
 ```
 
-在终端中进入该文件夹，并使用 `composer init` 命令初始化 Composer 项目：
+在终端中进入该文件夹，然后使用 `composer init` 命令在其中初始化 Composer 项目：
 
 ```bash
 composer init
 ```
 
-在此过程中，你需要回答一些问题。默认答案通常已足够，但你也可以根据需要在此处进行更精细的配置，以便更好地适配你的 PHP HTML 解析项目。
+在此过程中，系统会询问你几个问题。使用默认答案即可，但如果需要，你也可以提供更具体的信息，以便为 PHP HTML 解析项目定制设置。
 
-接下来，在你喜欢的 IDE 中打开该项目文件夹。[带有 PHP 扩展的 Visual Studio Code](https://code.visualstudio.com/docs/languages/php) 或者 [IntelliJ WebStorm](https://www.jetbrains.com/webstorm/) 都是不错的选择。
+接下来，在你常用的 IDE 中打开项目文件夹。[安装了 PHP 扩展的 Visual Studio Code](https://code.visualstudio.com/docs/languages/php) 或 [IntelliJ WebStorm](https://www.jetbrains.com/webstorm/) 都是 PHP 开发的理想选择。
 
-现在，在项目文件夹中添加一个空的 `index.php` 文件。此时，你的项目结构应大致如下：
+现在，在项目文件夹中添加一个空的 `index.php` 文件。此时，你的项目结构应如下所示：
 
 ```
 php-html-parser/
@@ -79,25 +80,25 @@ require_once __DIR__ . "/vendor/autoload.php";
 // scraping logic...
 ```
 
-使用下列命令运行脚本：
+使用以下命令运行脚本：
 
 ```bash
 php index.php
 ```
 
-## 在 PHP 中检索 HTML
+## 在 PHP 中获取 HTML
 
-在对 HTML 进行解析之前，需要先获取到相应的 HTML 内容。本节将展示两种在 PHP 中获取 HTML 的方法。我们也建议你阅读 [有关在 PHP 中进行网页抓取的指南](https://www.bright.cn/blog/how-tos/web-scraping-php)。
+在 PHP 中解析 HTML 之前，你需要先获取一些待解析的 HTML。本节将介绍两种在 PHP 中访问 HTML 内容的不同方法。我们也建议你阅读[使用 PHP 进行网页爬虫的指南](https://www.bright.cn/blog/how-tos/web-scraping-php)。
 
-### 通过 CURL
+### 使用 cURL
 
-PHP 原生支持 cURL，它是一个广泛使用的 HTTP 客户端，用于执行 HTTP 请求。可[启用 cURL 扩展](https://www.php.net/manual/en/book.curl.php)，或在 Ubuntu Linux 下使用以下命令安装：
+PHP 原生支持 cURL，这是一种常用于执行 HTTP 请求的热门 HTTP 客户端。[启用 cURL 扩展](https://www.php.net/manual/en/book.curl.php)，或使用以下命令在 Ubuntu Linux 上安装该扩展：
 
 ```bash
 sudo apt-get install php8.4-curl
 ```
 
-你可以使用 cURL 向在线服务器发送 HTTP GET 请求，并获取由该服务器返回的 HTML 文档。以下示例脚本通过 GET 请求来获取 HTML 内容：
+你可以使用 cURL 向在线服务器发送 HTTP GET 请求，并获取服务器返回的 HTML 文档。以下示例脚本会发送一个简单的 GET 请求并获取 HTML 内容：
 
 ```bash
 // initialize cURL session
@@ -119,7 +120,7 @@ curl_close($ch);
 echo $html;
 ```
 
-将上述代码片段添加到 `index.php` 并运行后，会输出类似以下内容的 HTML 代码：
+将上述代码片段添加到 `index.php` 并运行。它将生成以下 HTML 代码：
 
 ```html
 <!doctype html>
@@ -132,72 +133,72 @@ echo $html;
 </html>
 ```
 
-### 从文件中读取
+### 从文件获取
 
-假设你有一个名为 `index.html` 的文件，其中包含了 [Scrape This Site](https://www.scrapethissite.com/pages/forms/?per_page=100) “Hockey Teams” 页面（先前用 cURL 抓取）的 HTML 内容：
+假设你有一个名为 `index.html` 的文件，其中包含 [Scrape This Site](https://www.scrapethissite.com/pages/forms/?per_page=100) 上“Hockey Teams”页面的 HTML，该文件此前已使用 cURL 获取：
 
 ![项目文件夹中的 index.html 文件](https://github.com/bright-cn/php-html-parsing/blob/main/Images/The-index.html-file-in-the-project-folder-2048x1216.png)
 
-## 在 PHP 中解析 HTML：三种方法
+## 在 PHP 中解析 HTML：3 种方法
 
-本节将演示使用三个不同的库来解析 HTML：
+本节介绍如何使用三个不同的库在 PHP 中解析 HTML：
 
-1. 使用原生 PHP 的 `Dom\HTMLDocument`  
-2. 使用 Simple HTML DOM Parser 库  
-3. 使用 Symfony 的 `DomCrawler` 组件  
+1. 在原生 PHP 中使用 `Dom\HTMLDocument`
+2. 使用 Simple HTML DOM Parser 库
+3. 使用 Symfony 的 `DomCrawler` 组件
 
-三种情况下，我们都会从本地文件 `index.html` 读取 HTML，选中页面上的所有冰球队数据并提取其信息：
+在这三种情况下，你都需要解析本地 `index.html` 文件中的 HTML，选择页面上的所有冰球队条目并从中提取数据：
 
 ![目标页面上的表格](https://github.com/bright-cn/php-html-parsing/blob/main/Images/The-table-on-the-target-page-2048x1107.png)
 
-最终结果将是一个有关冰球队信息的列表，包含以下字段：
+最终结果将是抓取到的冰球队条目列表，其中包含以下详细信息：
 
-- 队伍名称（Team Name）  
-- 年份（Year）  
-- 胜场数（Wins）  
-- 败场数（Losses）  
-- 胜率（Win %）  
-- 进球数（Goals For / GF）  
-- 失球数（Goals Against / GA）  
-- 净胜球（Goal Difference / Diff）  
+- 球队名称
+- 年份
+- 胜场数
+- 负场数
+- 胜率
+- 进球数（GF）
+- 失球数（GA）
+- 净胜球
 
-这些数据来自于带有以下结构的 HTML 表格：
+你可以从具有以下结构的 HTML 表格中提取这些数据：
 
 ![表格行的 HTML DOM 结构](https://github.com/bright-cn/php-html-parsing/blob/main/Images/The-HTML-DOM-structure-of-the-tables-rows-2048x1134.png)
 
-表格每一行中的各列都有特定的 class，可以通过这些 class 来选择对应的元素并获取其文本内容。
+表格行中的每一列都有特定的类，因此你可以将类用作 CSS 选择器来选择元素，并通过元素文本获取其内容，从而提取数据。
 
-## 方法一：使用 Dom\HTMLDocument
+## 方法 1：使用 Dom\\HTMLDocument
 
-PHP 8.4+ 原生支持 [`Dom\HTMLDocument`](https://www.php.net/manual/en/class.dom-htmldocument.php) 类。它表示一个 HTML 文档，并允许你解析 HTML 和遍历 DOM 树。
+PHP 8.4+ 内置了 [`Dom\HTMLDocument`](https://www.php.net/manual/en/class.dom-htmldocument.php) 类。该类表示一个 HTML 文档，支持解析 HTML 内容和浏览 DOM 树。
 
-### 第一步：安装与设置
+### 步骤 1：安装与设置
 
-`Dom\HTMLDocument` 属于 [PHP 标准库（SPL）](https://www.php.net/manual/en/book.spl.php) 的一部分。但你需要启用 [DOM 扩展](https://www.php.net/manual/en/intro.dom.php) 或在 Linux 下使用以下命令安装：
+`Dom\HTMLDocument` 是 [PHP 标准库](https://www.php.net/manual/en/book.spl.php)的一部分。但要使用它，你仍需启用 [DOM 扩展](https://www.php.net/manual/en/intro.dom.php)，或通过以下 Linux 命令安装该扩展：
 
 ```bash
 sudo apt-get install php-dom
 ```
 
-### 第二步：解析 HTML
+### 步骤 2：HTML 解析
 
-可以使用如下方式解析 HTML 字符串：
+你可以按如下方式解析 HTML 字符串：
 
 ```php
 $dom = \DOM\HTMLDocument::createFromString($html);
 ```
 
-对于本地文件 `index.html`，可以这样写：
+你可以使用以下代码解析 `index.html` 文件：
 
 ```php
 $dom = \DOM\HTMLDocument::createFromFile("./index.html");
 ```
 
-解析后，`$dom` 将是一个 [`Dom\HTMLDocument`](https://www.php.net/manual/en/class.dom-htmldocument.php) 对象，你可以使用它提供的方法来进行数据提取。
+`$dom` 是一个 [`Dom\HTMLDocument`](https://www.php.net/manual/en/class.dom-htmldocument.php) 对象，提供数据解析所需的方法。
 
-### 第三步：数据提取
+### 步骤 3：数据解析
 
-下面的示例演示如何使用 `\DOM\HTMLDocument` 获取所有冰球队数据：
+你可以使用 `\DOM\HTMLDocument` 并通过以下方法选择所有冰球队条目：
 
 ```php
 // select each row on the page
@@ -236,17 +237,17 @@ foreach ($rows as $row) {
 }
 ```
 
-`\DOM\HTMLDocument` 并没有提供高级的查询方式，因此只能使用诸如 `getElementsByTagName()` 等方法来遍历元素或属性。
+`\DOM\HTMLDocument` 不提供高级查询方法，因此你必须依赖 `getElementsByTagName()` 等方法并进行手动迭代。
 
-上述示例中使用的方法包括：
+以下是所用方法的详细说明：
 
-- `getElementsByTagName()`：获取文档中所有指定标签（如 `<table>`、`<tr>`、`<td>`）的元素；  
-- `item()`：从返回的元素列表中获取单个元素；  
-- `textContent`：获取元素内部的文本内容，用于提取可见的数据（例如球队名称、年份等）。  
+- `getElementsByTagName()`：获取文档中指定标签（如 `<table>`、`<tr>` 或 `<td>`）的所有元素。
+- `item()`：从 `getElementsByTagName()` 返回的元素列表中获取单个元素。
+- `textContent`：此属性用于获取元素的原始文本内容，使你可以提取可见数据（如球队名称、年份等）。
 
-此外还使用了 [`trim()`](https://www.php.net/manual/en/function.trim.php) 来去除空格，使提取得来的数据更干净。
+我们还使用了 [`trim()`](https://www.php.net/manual/en/function.trim.php) 来删除文本内容前后的多余空白，以获得更整洁的数据。
 
-当把以上代码添加到 `index.php` 文件后，将会输出类似如下的结果：
+将上述代码片段添加到 `index.php` 后，将生成以下结果：
 
 ```php
 Array
@@ -261,7 +262,7 @@ Array
     [goal_diff] => 35
 )
 
-// 省略若干输出...
+// omitted for brevity...
 
 Array
 (
@@ -276,45 +277,45 @@ Array
 ) 
 ```
 
-## 方法二：使用 Simple HTML DOM Parser
+## 方法 2：使用 Simple HTML DOM Parser
 
-[Simple HTML DOM Parser](https://github.com/voku/simple_html_dom) 是一个轻量级的 PHP 库，可以让你更方便地解析和操作 HTML。
+[Simple HTML DOM Parser](https://github.com/voku/simple_html_dom) 是一个轻量级 PHP 库，可用于轻松解析和操作 HTML 内容。
 
-### 第一步：安装与设置
+### 步骤 1：安装与设置
 
-通过 Composer 安装 Simple HTML DOM Parser：
+你可以通过 Composer 使用以下命令安装 Simple HTML DOM Parser：
 
-```bash
+```php
 composer require voku/simple_html_dom
 ```
 
-或者，你也可以手动下载并将 `simple_html_dom.php` 文件包含到项目中。
+或者，你也可以手动下载 `simple_html_dom.php` 文件并将其包含在项目中。
 
-随后在 `index.php` 中引入：
+然后，在 `index.php` 中使用以下代码将其导入：
 
 ```php
 use voku\helper\HtmlDomParser;
 ```
 
-### 第二步：解析 HTML
+### 步骤 2：HTML 解析
 
-若要解析 HTML 字符串，可使用 `file_get_html()` 方法：
+要解析 HTML 字符串，请使用 `file_get_html()` 方法：
 
 ```php
 $dom = HtmlDomParser::str_get_html($html);
 ```
 
-在解析本地文件 `index.html` 时，可改用：
+要解析 `index.html`，请改为编写 `file_get_html()`：
 
 ```php
 $dom = HtmlDomParser::file_get_html($str);
 ```
 
-这会将 HTML 内容加载到 `$dom` 对象中，你可以轻松地遍历 DOM 进行数据提取。
+这会将 HTML 内容加载到 `$dom` 对象中，让你能够轻松浏览 DOM。
 
-### 第三步：数据提取
+### 步骤 3：数据解析
 
-使用 Simple HTML DOM Parser 来提取冰球队数据：
+使用 Simple HTML DOM Parser 从 HTML 中提取冰球队数据：
 
 ```php
 // find all rows in the table
@@ -365,54 +366,53 @@ foreach ($rows as $row) {
 }
 ```
 
-上述 Simple HTML DOM Parser 中用到的功能包括：
+上面使用的 Simple HTML DOM Parser 功能包括：
 
-- `findMulti()`：选中所有符合指定 CSS 选择器的元素；  
-- `findOne()`：选中符合指定 CSS 选择器的第一个元素；  
-- `plaintext`：用来获取 HTML 元素的原始文本内容。  
+- `findMulti()`：选择由指定 CSS 选择器标识的所有元素。
+- `findOne()`：查找与指定 CSS 选择器匹配的第一个元素。
+- `plaintext`：用于获取 HTML 元素内部原始文本内容的属性。
 
-相比第一种方法，这次我们使用了更强大的 CSS 选择器。但最终数据提取的结果相同。
+这次，我们应用了 CSS 选择器，使逻辑更加全面、稳健。不过，结果仍与第一种 PHP HTML 解析方法相同。
 
-## 方法三：使用 Symfony 的 DomCrawler 组件
+## 方法 3：使用 Symfony 的 DomCrawler 组件
 
-[Symfony 的 `DomCrawler` 组件](https://symfony.com/doc/current/components/dom_crawler.html) 提供了一种简单的方式来解析 HTML 文档，并从中提取所需数据。
+[Symfony 的 `DomCrawler` 组件](https://symfony.com/doc/current/components/dom_crawler.html)提供了一种解析 HTML 文档并从中提取数据的简便方法。
 
-> **注意**  
-> 该组件属于 [Symfony 框架](https://symfony.com/) 的一部分，但可以单独使用。本节即是单独使用的示例。
+> **注意**：该组件是 [Symfony 框架](https://symfony.com/)的一部分，但也可以独立使用，本节将采用这种方式。
 
-### 第一步：安装与设置
+### 步骤 1：安装与设置
 
-使用 Composer 安装 Symfony 的 `DomCrawler` 组件：
+使用以下 Composer 命令安装 Symfony 的 `DomCrawler` 组件：
 
 ```bash
 composer require symfony/dom-crawler
 ```
 
-随后在 `index.php` 文件中引入：
+然后，在 `index.php` 文件中将其导入：
 
 ```php
 use Symfony\Component\DomCrawler\Crawler;
 ```
 
-### 第二步：解析 HTML
+### 步骤 2：HTML 解析
 
-若要解析 HTML 字符串，可使用 `Crawler` 类的构造方法：
+要解析 HTML 字符串，请使用 `html()` 方法创建一个 [`Crawler`](https://github.com/symfony/symfony/blob/7.2/src/Symfony/Component/DomCrawler/Crawler.php) 实例：
 
 ```php
 $crawler = new Crawler($html);
 ```
 
-若要解析本地文件，可以使用 `file_get_contents()` 并创建 `Crawler` 实例：
+要解析文件，请使用 `file_get_contents()` 并创建 `Crawler` 实例：
 
 ```php
 $crawler = new Crawler(file_get_contents("./index.html"));
 ```
 
-这样就把 HTML 内容加载到了 `$crawler` 对象中，你可以利用它提供的各种方法来遍历并提取数据。
+上述代码会将 HTML 内容加载到 `$crawler` 对象中，该对象提供了便于遍历和提取数据的方法。
 
-### 第三步：数据提取
+### 步骤 3：数据解析
 
-使用 `DomCrawler` 组件来提取冰球队信息：
+使用 `DomCrawler` 组件提取冰球队数据：
 
 ```php
 // select all rows within the table
@@ -463,30 +463,30 @@ $rows->each(function ($row, $i) {
 });
 ```
 
-`DomCrawler` 中用到的方法包括：
+使用的 `DomCrawler` 方法包括：
 
-- `each()`：对选中的元素列表进行遍历；  
-- `filter()`：使用 CSS 选择器选中所需元素；  
-- `text()`：获取选中元素的文本内容。  
+- `each()`：遍历所选元素的列表。
+- `filter()`：根据 CSS 选择器选择元素。
+- `text()`：提取所选元素的文本内容。
 
 ## 在 PHP 中解析 HTML：对比表
 
-下表总结了上述三种 PHP HTML 解析方法的对比：
+你可以通过下面的汇总表，对本文介绍的三种 PHP HTML 解析方法进行比较：
 
-|                    | **\DOM\HTMLDocument** | **Simple HTML DOM Parser** | **Symfony 的 DomCrawler** |
-| ------------------ | ---------------------- | -------------------------- | ------------------------- |
-| **类型**           | 原生 PHP 组件         | 第三方库                   | Symfony 组件             |
-| **GitHub Stars**   | —                     | 880+                       | 4,000+                   |
-| **XPath 支持**     | ❌                    | ✔️                          | ✔️                        |
-| **CSS 选择器支持** | ❌                    | ✔️                          | ✔️                        |
-| **学习难度**       | 低                    | 低到中                     | 中                       |
-| **易用度**         | 中                    | 高                          | 高                       |
-| **API 丰富程度**   | 基础                  | 丰富                        | 丰富                     |
+|     | **\\DOM\\HTMLDocument** | **Simple HTML DOM Parser** | **Symfony 的 DomCrawler** |
+| --- | --- | --- | --- |
+| **类型** | PHP 原生组件 | 外部库 | Symfony 组件 |
+| **GitHub Star 数** | —   | 880+ | 4,000+ |
+| **XPath 支持** | ❌   | ✔️  | ✔️  |
+| **CSS 选择器支持** | ❌   | ✔️  | ✔️  |
+| **学习难度** | 低 | 低到中等 | 中等 |
+| **易用性** | 中等 | 高 | 高 |
+| **API** | 基础 | 丰富 | 丰富 |
 
-## 结论
+## 总结
 
-以上方法在应对传统静态页面时非常有效。但是，如果目标网页依赖 JavaScript 渲染，那么简单的 HTML 解析方式（如上所示）就无法满足需求。这时，你需要使用带有更高级 HTML 解析功能的完整抓取浏览器，例如 [抓取浏览器](https://www.bright.cn/products/scraping-browser) 等。
+尽管这些解决方案有效，但如果目标网页依赖 JavaScript 进行渲染，它们便无法发挥作用。在这种情况下，上述简单的 HTML 解析方法并不足够。你需要改用具备高级 HTML 解析功能的全功能抓取浏览器，例如 [抓取浏览器](https://www.bright.cn/products/scraping-browser)。
 
-如果你想绕过 HTML 解析，直接获取结构化数据，可尝试我们的 [成品数据集](https://www.bright.cn/products/datasets)，它覆盖了数百个网站！
+如果你想跳过 HTML 解析并立即访问结构化数据，不妨探索我们覆盖数百个网站的[即用型数据集](https://www.bright.cn/products/datasets)！
 
-立即创建 Bright Data 帐号，开始免费试用我们的数据和抓取方案吧！
+立即创建 Bright Data 账号并开始免费试用，测试我们的数据和爬虫解决方案！ 
